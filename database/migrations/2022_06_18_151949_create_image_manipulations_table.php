@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('data');
             $table->string('output_path', 2000)->nullable();
             $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
             $table->foreignIdFor(User::class, 'user_id')->nullable();
             $table->foreignIdFor(Album::class, 'album_id')->nullable();
         });

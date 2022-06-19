@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ResizeImageManipulationRequest;
 use App\Http\Requests\StoreImageManipulationRequest;
 use App\Http\Requests\UpdateImageManipulationRequest;
+use App\Http\Resources\V1\AlbumResource;
+use App\Http\Resources\v1\ImageManipulationResource;
+use App\Http\Resources\V1\ImageManipulationResources;
 use App\Models\Album;
 use App\Models\ImageManipulation;
 // use Faker\Core\File;
@@ -29,10 +32,14 @@ class ImageManipulationController extends Controller
      */
     public function index()
     {
-        //
+        return ImageManipulationResources::collection(ImageManipulation::paginate());
     }
     public function byAlbum(Album $album)
     {
+        $where=[
+            'album_id'=>$album
+        ]
+        return ImageManipulationResources::collection(ImageManipulation::where()- paginate());
     }
 
     /**
@@ -65,7 +72,8 @@ class ImageManipulationController extends Controller
         if ($image instanceof FileUploadedFile) {
             $data['name'] = $image->getClientOriginalName();
             // test.jpg =test-resize.jpg
-            $filename = pathinfo($data['name'] . PATHINFO_FILENAME);
+            // $filename = pathinfo($data['name'] . PATHINFO_FILENAME);
+            $filename = $data['name'] . PATHINFO_FILENAME;
             $extension = $image->getClientOriginalExtension();
             $originalPath = $absoutPath . $data['name'];
             $image->move($absoutPath, $data['name']);
@@ -80,8 +88,16 @@ class ImageManipulationController extends Controller
         $w = $all['w'];
         $h = $all['h'] ?? false;
 
-        list($width, $height) =  $this->getImageWidthAndHeight($w, $h, $originalPath);
-        var_dump($width, $height);
+        list($width, $height, $image) =  $this->getImageWidthAndHeight($w, $h, $originalPath);
+        // var_dump($extension);
+        // exit;
+        $resizefilename = $filename . '-resized.' . $extension;
+        $image->resize($width, $height)->save($absoutPath . $resizefilename);
+        $data['output_path'] = $dir . $resizefilename;
+        // var_dump($data);
+        $imageManipulation = ImageManipulation::create($data);
+        return new ImageManipulationResources($imageManipulation);
+        // return $imageManipulation;
     }
 
     /**
@@ -126,6 +142,6 @@ class ImageManipulationController extends Controller
             $newHeight = $height ? (float) $height : $originalPath * $newWidth / $orinalWIdth;
         }
 
-        return [$newHeight, $newHeight];
+        return [$newHeight, $newHeight, $image];
     }
 }

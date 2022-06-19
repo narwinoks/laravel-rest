@@ -9,7 +9,9 @@ class ImageManipulation extends Model
 {
     use HasFactory;
 
+    protected $table = 'image_manipulations';
+    // public $timestamps = false;
     const TYPE_RESIZE = 'resize';
-    const  update_data = false;
+    const  updated_at = null;
     protected $guarded = ['id'];
 }
