@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ImageManipulation extends Model
 {
     use HasFactory;
+
+    const TYPE_RESIZE = 'resize';
+    const  update_data = false;
+    protected $guarded = ['id'];
 }

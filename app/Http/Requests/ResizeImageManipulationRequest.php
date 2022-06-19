@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use GuzzleHttp\Psr7\UploadedFile;
 use Illuminate\Foundation\Http\FormRequest;
+use Symfony\Component\HttpFoundation\File\UploadedFile as FileUploadedFile;
 
 class ResizeImageManipulationRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class ResizeImageManipulationRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,8 +25,23 @@ class ResizeImageManipulationRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+            'image' => ['required'],
+            'w' => ['required', 'regex:/^\d+(\.\d+)?%?$/'],
+            'h' => 'regex:/^\d+(\.\d+)?%?$/',
+            'album_id' => 'exists:App\Models\Album,id'
         ];
+
+        $image = $this->all()['image'] ?? false;
+        // var_dump($image);
+        // exit;
+        if ($image && $image instanceof FileUploadedFile) {
+            $rules['image'][] = 'image';
+        } else {
+            $rules['image'][] = 'url';
+        }
+        // var_dump($rules);
+        // exit;
+        return $rules;
     }
 }

@@ -7,6 +7,9 @@ use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
 use App\Http\Resources\V1\AlbumResource;
 use App\Models\Album;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Http;
 
 class AlbumController extends Controller
 {
@@ -17,7 +20,13 @@ class AlbumController extends Controller
      */
     public function index()
     {
-        return AlbumResource::collection(Album::paginate());
+        $data = AlbumResource::collection(Album::paginate());
+        $response = [
+            'message' => 'successfully',
+            'data' => $data
+        ];
+        // return  response()->json($response, 200);
+        return $data;
     }
 
     /**
